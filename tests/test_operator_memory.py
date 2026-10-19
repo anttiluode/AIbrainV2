@@ -4,6 +4,7 @@ import numpy as np
 from operator_memory import (
     CUE_BITS,VALUE_BITS,MATRIX_BYTES,ConnectionMemory,IndexedMemory,
     encode_key,make_operator,response_matrix,euler_relaxation,dataset,
+    DegreeNormalizedMemory,
     swapped_queries,run_case,benchmark,_score_by_class)
 
 
@@ -14,6 +15,15 @@ class OperatorTests(unittest.TestCase):
         h=make_operator(g)
         np.testing.assert_allclose(h,h.T,atol=1e-14)
         self.assertGreater(np.linalg.eigvalsh(h).min(),0.)
+
+    def test_first_order_degree_normalization_at_weak_coupling(self):
+        rng=np.random.default_rng(27)
+        w=rng.random((16,8))*1e-4
+        baseline=DegreeNormalizedMemory()
+        baseline.w[:]=w
+        q=encode_key([1,3,5,7])
+        np.testing.assert_allclose(baseline.read(q),response_matrix(w)@q,
+                                   rtol=.005,atol=1e-11)
 
     def test_graph_schur_equals_direct_equilibrium_solver(self):
         rng=np.random.default_rng(7)
