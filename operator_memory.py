@@ -107,6 +107,25 @@ class ConnectionMemory:
         return self.w.nbytes
 
 
+
+class DegreeNormalizedMemory(ConnectionMemory):
+    """Post-result diagnostic: first-order, no-relaxation Schur approximation.
+
+    Approximates the graph Green's function as Dv^-1 G^T Dk^-1.
+    Stores EXACTLY the same W and uses the same Hebbian writer. It does
+    NOT claim to be part of the preregistered primary two-way comparison.
+    """
+    def __init__(self):
+        super().__init__(False,np.zeros((CUE_BITS,VALUE_BITS),dtype=np.float32))
+
+    def read(self,keys):
+        q=np.asarray(keys,dtype=float)
+        dk=LEAK+self.w.sum(axis=1)
+        dv=LEAK+self.w.sum(axis=0)
+        t=(self.w.T/dk[None,:])/dv[:,None]
+        return q@t.T
+
+
 class IndexedMemory:
     """Strong packed-key control: two cue bytes + one label byte per binding."""
     def __init__(self):
@@ -192,12 +211,15 @@ def run_case(load,seed):
     graph=ConnectionMemory.empty(True)
     direct=ConnectionMemory.empty(False)
     indexed=IndexedMemory()
-    models={'operator':graph,'fast_weight':direct,'indexed':indexed}
+    degree=DegreeNormalizedMemory()
+    models={'operator':graph,'fast_weight':direct,
+            'degree_normalized':degree,'indexed':indexed}
     for _ in range(3):
         for key,label in zip(keys,labels):
             for memory in models.values():
                 memory.write(key,int(label))
     assert np.array_equal(graph.w,direct.w), "paired writer mismatch"
+    assert np.array_equal(graph.w,degree.w), "diagnostic writer mismatch"
     before=evaluate(models,keys,labels,seed=22000+seed*100+load)
 
     rng=np.random.default_rng(30100+seed*100+load)
@@ -213,6 +235,7 @@ def run_case(load,seed):
             for memory in models.values():
                 memory.write(key,int(next_labels[idx]))
     assert np.array_equal(graph.w,direct.w), "paired rewrite mismatch"
+    assert np.array_equal(graph.w,degree.w), "diagnostic rewrite mismatch"
     new=evaluate(models,keys[rewritten],next_labels[rewritten],
                  seed=41000+seed*100+load)
     retention=evaluate(models,keys[untouched],labels[untouched],
@@ -244,7 +267,7 @@ def run_case(load,seed):
 
 def benchmark(loads=(8,16,32,64),seeds=tuple(range(12))):
     cases=[run_case(load,seed) for load in loads for seed in seeds]
-    methods=('operator','fast_weight','indexed')
+    methods=('operator','fast_weight','degree_normalized','indexed')
     summary={}
     for load in loads:
         subset=[c for c in cases if c['load']==load]
@@ -270,5 +293,6 @@ def benchmark(loads=(8,16,32,64),seeds=tuple(range(12))):
               'passes':bool(op-direct>=.05 and op_new-direct_new>=-.02)}
     return dict(spec={'loads':list(loads),'seeds':list(seeds),
                       'matrix_bytes':MATRIX_BYTES,'writer':'identical add-only Hebb',
-                      'rewrite_fraction':.25,'noisy_query':'one active bit swap'},
+                      'rewrite_fraction':.25,'noisy_query':'one active bit swap',
+                      'degree_normalized':'POST-RESULT diagnostic, not primary gate'},
                 summary=summary,decision=decision,cases=cases)
