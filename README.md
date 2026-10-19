@@ -1,5 +1,7 @@
 # AIbrainV2 — Queryable response geometry
 
+Part of monday madness - 8 repos mostly consolidated to Sihtibrain. 
+
 ![Queryable operator memory](docs/response_geometry.svg)
 
 **Can experience change how a system answers a query, without continuously maintaining an activation?** This small, CPU-only associative-memory laboratory makes that idea testable.
