@@ -61,6 +61,25 @@ This is an ordinary grounded-Laplacian Green's function (Schur complement). Iter
 
 The simple, no-relaxation first-order approximation `D_v⁻¹WᵀD_k⁻¹` was added as an explanatory baseline **after** observing the initial outcome; it captures most of the improvement.
 
+## Gate 2: TEM-inspired relational addresses (new independent experiment)
+
+**[Precommitted protocol](docs/GATE2_PROTOCOL.md) · [Detailed results and falsification](docs/GATE2_RESULT.md)**
+
+Does an action-integrated address retrieve a previously experienced location through a route never taken before? Unlike Gate 1, the tasks have reusable relational structure. A given 6×6 torus has arbitrary independent sensory symbols and labels; the agent sees action sequences and observed values, not the target coordinate ID.
+
+Across twenty fresh worlds and 18 observed locations, a **384-byte phase/delta memory** recalls **82.2%** of hidden labels via different routes, versus **34.2%** for content keys and **18.3%** for time keys. All share the same memory size. The action-rotation invariance passes to numerical precision; a wrong action rule destroys the advantage. Thus the **structural-addressing gate passes**.
+
+**But the decisive strong control wins:** a classical indexed lookup integrates the *same given action structure*, recalls **100%**, and uses only **54 bytes** at this load. At 30 visited locations, phase recall falls to **56.7%**, versus indexed **100%** in 90 bytes. The *algorithmic-superiority gate fails*. We supplied the transition algebra instead of learning it, so this is NOT an implementation of the learned Tolman–Eichenbaum Machine.
+
+The rewrite results expose a useful memory tradeoff: at 18 locations, phase-delta correctly writes **100%** of changed labels but preserves only **66.1%** of untouched ones; phase-Hebb preserves **84.3%** but updates only **46.3%** of changed labels. The indexed baseline achieves both at 100%.
+
+```bash
+python -m unittest discover -s tests -v
+python demo_tem.py --output runs/tem_gate2
+```
+
+The four-panel figure, complete twenty-world JSON and summary CSV are reproducible locally and uploaded by GitHub Actions. **Next**: separately test whether an action structure can be *learned* and reused across unseen worlds, against proper structured graph/index and learned-coordinate baselines, before connecting it to a frozen LLM.
+
 ## What's next?
 
 Not another simulated neuron. A meaningful next gate would keep the same budget but test **selective error-correcting writes** against a strong normalized fast-weight control and indexed memory, on longer sequences with harder interference. Freeze the protocol first; let the result be negative if it fails.
