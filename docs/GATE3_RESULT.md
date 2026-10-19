@@ -31,6 +31,19 @@ The classical learned-graph indexed model receives **exactly the same learned ac
 
 **Hard superiority gate FAIL**: the structured index beats spectral recall with dramatically less storage.
 
+## Post-result 16-seed random-code sensitivity (not preregistered)
+
+After observing the original 5.28-point advantage against one frozen random-code seed, we reran the exact same learned graph and twenty target worlds with **16 new random graph-state code tables** (seeds 42000..42015). This is deliberately a *post-result* diagnostic rather than a redefinition of the original decision.
+
+| Visited locations | Spectral delta | Mean random-state delta | Spectral minus mean random | Random-seed wins by spectral |
+|---|---:|---:|---:|---:|
+| 18 | **83.06%** | 79.77% | +3.28 percentage points | 14/16 |
+| 30 | 54.50% | **56.05%** | −1.55 percentage points | 3/16 |
+
+At 18 observed states, the result is suggestive that graph-spectral structure is useful beyond an arbitrary state code, **but the advantage does not reach the originally set 5-point threshold against the mean of these new random seeds**. At higher load it reverses. Neither result supports the claim that spectral structure is a new efficient memory system: graph indexing remains perfect, much smaller and simpler.
+
+The extra code seeds are *not* independent world datasets; all were compared on the same twenty worlds. Do not count them as 320 independent worlds or treat this as a preregistered significance test.
+
 ## Storage costs and the stability–plasticity limit
 
 The spectral/delta approach needs 144 bytes for the learned transition table, 36×12×4 = 1728 bytes for the spectral key table, and 8×12×4 = 384 bytes for its read/write matrix: **2256 bytes total**. The indexed approach retains the **same learned 144-byte structural table**, plus 18 target binding bytes = **162 bytes** (174 bytes for 30 bindings).
