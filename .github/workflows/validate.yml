@@ -24,7 +24,11 @@ jobs:
         run: python -m py_compile gui.py
       - name: Reproduce preregistered benchmark
         run: python demo.py --output runs/operator_gate1
+      - name: Relational address invariants and held-out worlds
+        run: python demo_tem.py --output runs/tem_gate2
       - uses: actions/upload-artifact@v4
         with:
           name: aibrainv2-${{ matrix.python-version }}
-          path: runs/operator_gate1/
+          path: |
+            runs/operator_gate1/
+            runs/tem_gate2/
