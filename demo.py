@@ -11,8 +11,9 @@ def figure(metrics,outfile):
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     loads=[8,16,32,64]
-    modes=["operator","fast_weight","indexed"]
+    modes=["operator","fast_weight","degree_normalized","indexed"]
     names={"operator":"Graph operator","fast_weight":"Direct fast weights",
+           "degree_normalized":"Degree-normalized read (post-result)",
            "indexed":"Packed indexed lookup"}
     data=metrics["summary"]
     fig,axes=plt.subplots(2,2,figsize=(13,9),layout="constrained")
