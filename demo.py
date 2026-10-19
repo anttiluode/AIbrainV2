@@ -61,6 +61,18 @@ def main():
     (args.output/"metrics.json").write_text(json.dumps(result,indent=2)+"\n")
     figure(result,args.output/"operator_gate1.png")
     print(json.dumps(result["decision"],indent=2))
+    for baseline in ("fast_weight","degree_normalized"):
+        ids=sorted({z["seed"] for z in result["cases"]})
+        diffs=np.array([np.mean([
+          z["untouched"]["operator"]["one_swap"]-
+          z["untouched"][baseline]["one_swap"]
+          for z in result["cases"] if z["seed"]==seed]) for seed in ids])
+        rng=np.random.default_rng(9218)
+        resamples=rng.choice(diffs,size=(10000,len(diffs)),replace=True)
+        lo,hi=np.quantile(resamples.mean(axis=1),[.025,.975])
+        print(f"Post-result paired seed-bootstrap advantage vs {baseline}: "
+              f"{diffs.mean()*100:.2f} percentage points "
+              f"[{lo*100:.2f}, {hi*100:.2f}] 95% interval")
     for load,ms in result["summary"].items():
         print(f"load {load:>2}: ",end="")
         print(" ".join(
