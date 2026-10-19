@@ -30,6 +30,8 @@ jobs:
         run: python demo_learned.py --output runs/learned_gate3
       - name: Post-result sensitivity to random address seeds
         run: python diagnostic_gate3_random_seeds.py --output runs/learned_gate3 --random-seeds 16
+      - name: Gate 4 sparse expansion and Bayesian noisy action correction
+        run: python demo_place.py --output runs/place_gate4
       - uses: actions/upload-artifact@v4
         with:
           name: aibrainv2-${{ matrix.python-version }}
@@ -37,3 +39,4 @@ jobs:
             runs/operator_gate1/
             runs/tem_gate2/
             runs/learned_gate3/
+            runs/place_gate4/

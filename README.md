@@ -97,6 +97,37 @@ python demo_learned.py --output runs/learned_gate3
 python diagnostic_gate3_random_seeds.py --output runs/learned_gate3
 \`\`\`
 
+## Gate 4: sparse structural keys and recovery from noisy actions
+
+**[Precommitted protocol](docs/GATE4_PROTOCOL.md) · [Full results and limitations](docs/GATE4_RESULT.md)**
+
+Claude's suggestion prompted a tightly controlled place-cell-style experiment: transform the existing 12D learned spectral graph address with a *frozen* random projection followed by **ReLU + top-k sparsity**, then write value labels through the same delta fast-weight rule as Gate 3. Independently test noisy action logs, sensory correction from partially known four-way aliased landmarks, and **a structured indexed graph using the same Bayesian filter**.
+
+Across 20 held-out worlds with 30 observed nodes and 25% rewritten labels:
+
+| Memory | New-route recall | Untouched retention | Total state bytes |
+|---|---:|---:|---:|
+| Original learned spectral 12D | 54.5% | 28.9% | 2,256 |
+| Sparse 64D (top 8) | 97.5% | 86.1% | 6,992 |
+| **Sparse 256D (top 16)** | **100%** | **98.7%** | **22,352** |
+| Dense ReLU 256D | 80.7% | 53.5% | 22,352 |
+| Fixed random 256D state hash | 100% | 100% | 45,200 |
+| One-hot state (36D) | 100% | 100% | 1,296 |
+| **Indexed learned graph** | **100%** | **100%** | **174** |
+
+The **precommitted sparse-key separation gate passes**, but this is a memory-capacity tradeoff, *not an efficient win over ordinary indexed addressing*. All 36 source locations were already distinct in 12D: nonlinear expansion improves separability without recovering truly lost information.
+
+With **15% corrupted action reports**, sparse 256D recall rises from **37.2% to 70.8%** at 18 stored locations when corrected by a Bayesian sensor filter. **An indexed graph supplied with the same sensor observations and a full value posterior achieves 81.4%**. At 30 stored locations the corresponding figures are 38.5%, 83.3%, and 87.3%. Sensor fusion, not an exclusive property of phase codes, explains the improvement.
+
+The learned source graph still depends on **uniquely identifiable source landmarks**; Gate 4 does not learn transitions from aliased input or implement the full Tolman–Eichenbaum Machine.
+
+\`\`\`bash
+python -m unittest discover -s tests -v
+python demo_place.py --output runs/place_gate4
+\`\`\`
+
+The source, 57 invariant tests across Gates 1–4, JSON results, CSV, and figure are reproduced in GitHub Actions on Python 3.11 and 3.13. Next: learning a world state under **aliased, noisy source observations**, with a classical Bayesian filter and learned recurrent comparators.
+
 ## What's next?
 
 Not another simulated neuron. A meaningful next gate would keep the same budget but test **selective error-correcting writes** against a strong normalized fast-weight control and indexed memory, on longer sequences with harder interference. Freeze the protocol first; let the result be negative if it fails.
