@@ -168,12 +168,22 @@ def swapped_queries(keys,seed,repeats=3):
     return np.stack(q)
 
 
+def _score_by_class(pred,labels):
+    """Macro accuracy over labels present in the queried set."""
+    labels=np.asarray(labels)
+    pred=np.asarray(pred)
+    present=np.unique(labels)
+    return float(np.mean([np.mean(pred[labels==k]==k) for k in present]))
+
+
 def evaluate(models,keys,labels,seed):
     noisy=swapped_queries(keys,seed)
     correct_noisy=np.repeat(labels,3)
     return {name:{
         'exact':float(np.mean(memory.predict(keys)==labels)),
-        'one_swap':float(np.mean(memory.predict(noisy)==correct_noisy))}
+        'one_swap':float(np.mean(memory.predict(noisy)==correct_noisy)),
+        'exact_macro':_score_by_class(memory.predict(keys),labels),
+        'one_swap_macro':_score_by_class(memory.predict(noisy),correct_noisy)}
         for name,memory in models.items()}
 
 
@@ -242,7 +252,7 @@ def benchmark(loads=(8,16,32,64),seeds=tuple(range(12))):
         for mode in methods:
             summary[str(load)][mode]={}
             for phase in ('before','rewritten','untouched'):
-                for query in ('exact','one_swap'):
+                for query in ('exact','one_swap','exact_macro','one_swap_macro'):
                     v=np.array([c[phase][mode][query] for c in subset])
                     summary[str(load)][mode][f'{phase}_{query}']={
                         'mean':float(v.mean()),
