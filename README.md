@@ -80,6 +80,23 @@ python demo_tem.py --output runs/tem_gate2
 
 The four-panel figure, complete twenty-world JSON and summary CSV are reproducible locally and uploaded by GitHub Actions. **Next**: separately test whether an action structure can be *learned* and reused across unseen worlds, against proper structured graph/index and learned-coordinate baselines, before connecting it to a frozen LLM.
 
+## Gate 3: learn the transition graph from experience, then transfer
+
+**[Precommitted protocol](docs/GATE3_PROTOCOL.md) · [Results, limitations and post-result seed check](docs/GATE3_RESULT.md)**
+
+Gate 2 was handed a torus transition rule. Gate 3 instead **identifies a 36-state action automaton from action-labeled walks past unique, randomly renamed source-world landmarks** and computes structural keys from its graph spectrum. All eight source worlds recover the same canonical state-transition table; the action structure then transfers to **20 held-out worlds** with four aliased sensory symbols and fresh arbitrary target labels.
+
+New-route recall at 18 visited locations: learned graph + spectral/delta **83.1%**, content-only **34.2%**, time-only **18.3%**. This passes the structural-addressing gate. Yet the **same learned graph with an indexed table** recalls **100%** and requires **162 bytes**, compared with **2256 bytes** total for spectral fast weights (including graph, code table, and weights). It decisively wins on rewrites and untouched retention.
+
+The spectral read only narrowly wins over one random graph-state code at 18 visits (83.1% vs 77.8%). A separately labeled **post-result** check across 16 random code seeds shows an average **+3.3-point** gain at 18 visits that becomes a **−1.6-point** disadvantage at 30 visits. Spectral geometry is not established as an algorithmic breakthrough.
+
+This is **classical system identification with uniquely identifiable landmarks**, not a learned TEM neural network: the transition model is constructed symbolically, the target worlds share action semantics, and the reset anchor is provided. The next research question is discovering reusable structure from **aliased partial noisy observations** without relying on landmark IDs.
+
+\`\`\`bash
+python demo_learned.py --output runs/learned_gate3
+python diagnostic_gate3_random_seeds.py --output runs/learned_gate3
+\`\`\`
+
 ## What's next?
 
 Not another simulated neuron. A meaningful next gate would keep the same budget but test **selective error-correcting writes** against a strong normalized fast-weight control and indexed memory, on longer sequences with harder interference. Freeze the protocol first; let the result be negative if it fails.

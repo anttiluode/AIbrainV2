@@ -26,9 +26,14 @@ jobs:
         run: python demo.py --output runs/operator_gate1
       - name: Relational address invariants and held-out worlds
         run: python demo_tem.py --output runs/tem_gate2
+      - name: Gate 3 learned relational structure on 20 held-out worlds
+        run: python demo_learned.py --output runs/learned_gate3
+      - name: Post-result sensitivity to random address seeds
+        run: python diagnostic_gate3_random_seeds.py --output runs/learned_gate3 --random-seeds 16
       - uses: actions/upload-artifact@v4
         with:
           name: aibrainv2-${{ matrix.python-version }}
           path: |
             runs/operator_gate1/
             runs/tem_gate2/
+            runs/learned_gate3/
